@@ -13,31 +13,29 @@ import matplotlib.pyplot as plt
 
 # In-line function for second equation
 equation_two = lambda theta, mu, yt, dt, sigma, noise : theta * (mu - yt) * dt + sigma * noise
-def secondEquation(num_sims:int, num_points:int, t_init:float, t_final:float, y_init:float,
-                  theta:float = 0.8, mu:float = 1.5, sigma:float = 0.06, noise_center:float = 0.0, noise_scale:float = 0.5):
+def secondEquation(y_init:float, theta:float, mu:float, sigma:float,
+                 noise_center:float = 0.0, num_sims:int = 5, num_points:int = 1000, t_init:float = 3, t_final:float = 7,):
     """
     Parameters
     ----------
-    num_sims : int
-        number of simulations to run and calculate data for
-    num_points : int
-        number of data points to calculate
-    t_init : float
-        initial time vlaue
-    t_final : float
-        final time value
     y_init : float
         initial function value
     theta : float, optional
-        Value for theta. The default is 0.8.
+        Value for theta. 
     mu : float, optional
-        Value for mu. The default is 1.5.
+        Value for mu. 
     sigma : float, optional
-        Value for sigma. The default is 0.06.
+        Value for sigma.
+    num_sims : int
+        number of simulations to run and calculate data for. The default is 5.
+    num_points : int
+        number of data points to calculate. The default is 1000.
+    t_init : float
+        initial time vlaue. The default is 3.
+    t_final : float
+        final time value. The default is 7.
     noise_center : float, optional
         Mean for Gaussian noise generator (numpy.random.normal). The default is 0.0.
-    noise_scale : float, optional
-        Scale for Gaussian noise generate (numpy.random.normal). The default is 0.5.
 
     Returns
     -------
@@ -46,7 +44,7 @@ def secondEquation(num_sims:int, num_points:int, t_init:float, t_final:float, y_
     """
 
     # In-line function to generate noise
-    noise = lambda : np.random.normal(loc = noise_center, scale = noise_scale) #same noise as first equation
+    noise = lambda : np.random.normal(loc = noise_center, scale = np.sqrt(dt)) #same noise as first equation
 
     equation_two = lambda theta, mu, yt, dt, sigma, noise : theta * (mu - yt) * dt + sigma * noise
 
@@ -83,29 +81,27 @@ def secondEquation(num_sims:int, num_points:int, t_init:float, t_final:float, y_
 
 
 
-def firstEquation(num_sims:int, num_points:int, t_init:float, t_final:float, y_init:float,
-                  mu:float = 1.5, sigma:float = 0.06, noise_center:float = 0.0, noise_scale:float = 0.5):
+def firstEquation(y_init:float, mu:float, sigma:float,
+                   num_sims:int = 5, num_points:int = 1000, t_init:float = 3, t_final:float = 7, noise_center:float = 0.0):
     """
     Parameters
     ----------
-    num_sims : int
-        number of simulations to run and calculate data for
-    num_points : int
-        number of data points to calculate
-    t_init : float
-        initial time vlaue
-    t_final : float
-        final time value
-    y_init : float
+     y_init : float
         initial function value
     mu : float, optional
-        Value for mu. The default is 1.5.
+        Value for mu. 
     sigma : float, optional
-        Value for sigma. The default is 0.06.
+        Value for sigma. 
+    num_sims : int
+        number of simulations to run and calculate data for. The default is 5.
+    num_points : int
+        number of data points to calculate. The default is 1000.
+    t_init : float
+        initial time vlaue. The default is 3.
+    t_final : float
+        final time value. The default is 7.
     noise_center : float, optional
         Mean for Gaussian noise generator (numpy.random.normal). The default is 0.0.
-    noise_scale : float, optional
-        Scale for Gaussian noise generate (numpy.random.normal). The default is 0.5.
 
     Returns
     -------
@@ -116,13 +112,15 @@ def firstEquation(num_sims:int, num_points:int, t_init:float, t_final:float, y_i
     equation_one = lambda mu, dt, sigma, noise : mu * dt + sigma * noise
 
     # In-line function to generate noise
-    noise = lambda : np.random.normal(loc = noise_center, scale = noise_scale)
+    noise = lambda : np.random.normal(loc = noise_center, scale = np.sqrt(dt))
 
     # Create list for simulations
     sims = []
 
     # Calculate time delta
     dt = (t_final - t_init) / num_points
+   
+    
     for sim in range(num_sims):
         # Create lists for storing points
         t_values = []
@@ -164,6 +162,7 @@ def plotAndOutputResults(simulation_results:list, path:str):
 
     for result in simulation_results:
         figure_axis.plot(result["t_set"], result["y_set"])
+       
 
     figure_axis.set_xlabel("time (s)")
     h = figure_axis.set_ylabel("y")
@@ -171,5 +170,8 @@ def plotAndOutputResults(simulation_results:list, path:str):
 
     figure.savefig(path)
 
-# Example useage
-plotAndOutputResults(secondEquation(5, 1000, 3, 7, 0), "output.png")
+# Example useage using paramters from wikipedia
+# secondEquation(y_init, theta, mu, sigma)
+# firstEquation(y_init, mu, sigma)
+plotAndOutputResults(secondEquation(0, 0.7, 1.5, 0.06), "SecondEquationResults.png")
+plotAndOutputResults(firstEquation(0, 1.5, 0.06), "FirstEquationResults.png")
