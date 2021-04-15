@@ -3,6 +3,8 @@
 Created on Thu Apr  8 12:26:07 2021
 
 @author: Cameron Cummins
+@author: Faith Reyes
+@author: Dylan Smith
 """
 
 import numpy as np
@@ -183,11 +185,6 @@ def plotAndOutputResults(simulation_results:list, path:str):
     #plotting the avg graph
     figure_axis.plot(avg_t, avg_y, label = "Average", c = "red")
 
-
-
-
-
-
     figure_axis.set_xlabel("time (s)")
     h = figure_axis.set_ylabel("y")
     h.set_rotation(0)
@@ -202,12 +199,26 @@ def plotAndOutputResults(simulation_results:list, path:str):
 # Example useage using paramters from wikipedia
 # secondEquation(y_init, theta, mu, sigma)
 # firstEquation(y_init, mu, sigma)
+
+avg_t_y001, avg_y_y001 = plotAndOutputResults(firstEquation(0, 1.5, 0.06), "FirstEquationResults.png")
+avg_t_y011, avg_y_y011 = plotAndOutputResults(firstEquation(1, 1.5, 0.06), "FirstEquationResults1.png")
+avg_t_y021, avg_y_y021 = plotAndOutputResults(firstEquation(2, 1.5, 0.06), "FirstEquationResults2.png")
+
 avg_t_y00, avg_y_y00 = plotAndOutputResults(secondEquation(0, 0.7, 1.5, 0.06), "SecondEquationResults.png")
 avg_t_y01, avg_y_y01 = plotAndOutputResults(secondEquation(1, 0.7, 1.5, 0.06), "SecondEquationResults1.png")
 avg_t_y02, avg_y_y02 = plotAndOutputResults(secondEquation(2, 0.7, 1.5, 0.06), "SecondEquationResults2.png")
-plotAndOutputResults(firstEquation(0, 1.5, 0.06), "FirstEquationResults.png")
-plotAndOutputResults(firstEquation(1, 1.5, 0.06), "FirstEquationResults1.png")
-plotAndOutputResults(firstEquation(2, 1.5, 0.06), "FirstEquationResults2.png")
+
+plt.clf()
+figure = plt.figure()
+figure_axis = figure.add_subplot()
+figure_axis.plot(avg_t_y001, avg_y_y001, label = "y_init = 0")
+figure_axis.plot(avg_t_y011, avg_y_y011, label = "y_init = 1")
+figure_axis.plot(avg_t_y021, avg_y_y021, label = "y_init = 2")
+figure_axis.set_xlabel("time (s)")
+h = figure_axis.set_ylabel("y")
+h.set_rotation(0)
+figure_axis.legend()
+figure.savefig("first_eq_Avg_y_init.png")
 
 plt.clf()
 figure = plt.figure()
@@ -219,4 +230,4 @@ figure_axis.set_xlabel("time (s)")
 h = figure_axis.set_ylabel("y")
 h.set_rotation(0)
 figure_axis.legend()
-figure.savefig("Avg_y_init.png")
+figure.savefig("second_eq_Avg_y_init.png")
