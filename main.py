@@ -14,16 +14,16 @@ import matplotlib.pyplot as plt
 # In-line function for second equation
 equation_two = lambda theta, mu, yt, dt, sigma, noise : theta * (mu - yt) * dt + sigma * noise
 def secondEquation(y_init:float, theta:float, mu:float, sigma:float,
-                 noise_center:float = 0.0, num_sims:int = 5, num_points:int = 1000, t_init:float = 3, t_final:float = 7,):
+                 noise_center:float = 0.0, num_sims:int = 5, num_points:int = 1000, t_init:float = 0, t_final:float = 5,):
     """
     Parameters
     ----------
     y_init : float
         initial function value
     theta : float, optional
-        Value for theta. 
+        Value for theta.
     mu : float, optional
-        Value for mu. 
+        Value for mu.
     sigma : float, optional
         Value for sigma.
     num_sims : int
@@ -31,9 +31,9 @@ def secondEquation(y_init:float, theta:float, mu:float, sigma:float,
     num_points : int
         number of data points to calculate. The default is 1000.
     t_init : float
-        initial time vlaue. The default is 3.
+        initial time vlaue. The default is 0.
     t_final : float
-        final time value. The default is 7.
+        final time value. The default is 5.
     noise_center : float, optional
         Mean for Gaussian noise generator (numpy.random.normal). The default is 0.0.
 
@@ -82,24 +82,24 @@ def secondEquation(y_init:float, theta:float, mu:float, sigma:float,
 
 
 def firstEquation(y_init:float, mu:float, sigma:float,
-                   num_sims:int = 5, num_points:int = 1000, t_init:float = 3, t_final:float = 7, noise_center:float = 0.0):
+                   num_sims:int = 5, num_points:int = 1000, t_init:float = 0, t_final:float = 5, noise_center:float = 0.0):
     """
     Parameters
     ----------
      y_init : float
         initial function value
     mu : float, optional
-        Value for mu. 
+        Value for mu.
     sigma : float, optional
-        Value for sigma. 
+        Value for sigma.
     num_sims : int
         number of simulations to run and calculate data for. The default is 5.
     num_points : int
         number of data points to calculate. The default is 1000.
     t_init : float
-        initial time vlaue. The default is 3.
+        initial time vlaue. The default is 0.
     t_final : float
-        final time value. The default is 7.
+        final time value. The default is 5.
     noise_center : float, optional
         Mean for Gaussian noise generator (numpy.random.normal). The default is 0.0.
 
@@ -119,8 +119,8 @@ def firstEquation(y_init:float, mu:float, sigma:float,
 
     # Calculate time delta
     dt = (t_final - t_init) / num_points
-   
-    
+
+
     for sim in range(num_sims):
         # Create lists for storing points
         t_values = []
@@ -159,19 +159,64 @@ def plotAndOutputResults(simulation_results:list, path:str):
     """
     figure = plt.figure()
     figure_axis = figure.add_subplot()
+    # print("number of sims", len(simulation_results))
 
     for result in simulation_results:
-        figure_axis.plot(result["t_set"], result["y_set"])
-       
+        figure_axis.plot(result["t_set"], result["y_set"], color = "gray")
+
+
+    #computing the average of all the simulations
+    avg_t = []
+    avg_y = []
+    #Going through each of the simulaitons y_0 then each y_1 then each y_2... y_N
+    #each time computing a mean of all the y_0 and y_1 and y_2...y_N
+    for i in range(len(simulation_results[0]["t_set"])):
+
+        avg_t.append(simulation_results[0]["t_set"][i]) #all t_values are the same, so taking the first one abritrarily
+        tot_yi = 0
+        number_y = len(simulation_results) #total number of sims we will get
+        k = 0
+        for sim in simulation_results:
+            tot_yi += sim["y_set"][i]
+        avg_y.append(tot_yi / number_y)
+
+    #plotting the avg graph
+    figure_axis.plot(avg_t, avg_y, label = "Average", c = "red")
+
+
+
+
+
 
     figure_axis.set_xlabel("time (s)")
     h = figure_axis.set_ylabel("y")
     h.set_rotation(0)
+    figure_axis.legend()
+
 
     figure.savefig(path)
+
+    #want to return the avg graph so we can compare
+    return avg_t, avg_y
 
 # Example useage using paramters from wikipedia
 # secondEquation(y_init, theta, mu, sigma)
 # firstEquation(y_init, mu, sigma)
-plotAndOutputResults(secondEquation(0, 0.7, 1.5, 0.06), "SecondEquationResults.png")
+avg_t_y00, avg_y_y00 = plotAndOutputResults(secondEquation(0, 0.7, 1.5, 0.06), "SecondEquationResults.png")
+avg_t_y01, avg_y_y01 = plotAndOutputResults(secondEquation(1, 0.7, 1.5, 0.06), "SecondEquationResults1.png")
+avg_t_y02, avg_y_y02 = plotAndOutputResults(secondEquation(2, 0.7, 1.5, 0.06), "SecondEquationResults2.png")
 plotAndOutputResults(firstEquation(0, 1.5, 0.06), "FirstEquationResults.png")
+plotAndOutputResults(firstEquation(1, 1.5, 0.06), "FirstEquationResults1.png")
+plotAndOutputResults(firstEquation(2, 1.5, 0.06), "FirstEquationResults2.png")
+
+plt.clf()
+figure = plt.figure()
+figure_axis = figure.add_subplot()
+figure_axis.plot(avg_t_y00, avg_y_y00, label = "y_init = 0")
+figure_axis.plot(avg_t_y01, avg_y_y01, label = "y_init = 1")
+figure_axis.plot(avg_t_y02, avg_y_y02, label = "y_init = 2")
+figure_axis.set_xlabel("time (s)")
+h = figure_axis.set_ylabel("y")
+h.set_rotation(0)
+figure_axis.legend()
+figure.savefig("Avg_y_init.png")
